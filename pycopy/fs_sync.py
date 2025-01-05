@@ -6,7 +6,7 @@ from pycopy import logging
 from pycopy import terminal_formatting
 
 
-def sync(src: Path, dest: Path, verbose=True, do_delete=False, check_metadata=True,
+def sync(src, dest, verbose=True, do_delete=False, check_metadata=True,
          advanced_output_features=True):
     """
     Sync the src and dest paths (can be files)
@@ -16,8 +16,10 @@ def sync(src: Path, dest: Path, verbose=True, do_delete=False, check_metadata=Tr
     :param do_delete: Whether files should be deleted
     :param check_metadata: Whether to check the modification date and the file size to determine whether the file needs to be updated
     :param advanced_output_features: Whether to use ANSI color codes in the output and print the current position in the file system
-    :return:
     """
+
+    src = to_path(src)
+    dest = to_path(dest)
 
     if not verbose:
         advanced_output_features = False
@@ -34,14 +36,14 @@ def sync(src: Path, dest: Path, verbose=True, do_delete=False, check_metadata=Tr
 
     if src.is_dir():
         if advanced_output_features:
-            utils.print_temp(src)
+            terminal_formatting.print_temp(src)
 
         if dest.exists() and not dest.is_dir():
             if not do_delete:
                 return
 
             if advanced_output_features:
-                utils.hide_temp()
+                terminal_formatting.hide_temp()
 
             if verbose:
                 logging.log("Deleting ", logging.Color(1), dest, use_color=advanced_output_features)
@@ -65,7 +67,8 @@ def sync(src: Path, dest: Path, verbose=True, do_delete=False, check_metadata=Tr
             sub_path = item.relative_to(src)
             sync(src / sub_path, dest / sub_path, **kwargs)
 
-        terminal_formatting.hide_temp()
+        if advanced_output_features:
+            terminal_formatting.hide_temp()
         return
 
     if not check_metadata:
@@ -120,3 +123,10 @@ def delete_path(file: Path):
         return
 
     file.unlink(missing_ok=True)
+
+
+def to_path(file):
+    if isinstance(file, Path):
+        return file
+
+    return Path(file)

@@ -58,4 +58,4 @@ def main():
             d.touch()
 
     for d in destinations:
-        sync(source, d, not args.quiet, args.delete, not args.force, not args.force, not args.no_color)
+        sync(source, d, not args.quiet, args.delete, not args.force, not args.no_color)

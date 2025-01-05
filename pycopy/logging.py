@@ -10,7 +10,7 @@ class Color:
 
     def ansi_escape_code(self):
         """Gets the ANSI escape code sequence for this color object"""
-        if code is None:
+        if self.code is None:
             return "\x1b[m"
         else:
             return f"\x1b[38;5;{self.code}"
