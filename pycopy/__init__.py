@@ -2,8 +2,8 @@ import argparse
 from pathlib import Path
 
 import pycopy.logging as logging
-import version
-from fs_sync import sync
+import pycopy.version as version
+from pycopy.fs_sync import sync
 
 PROGRAM_NAME = "pycopy"
 

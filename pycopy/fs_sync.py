@@ -2,52 +2,105 @@ import os.path as path
 import shutil
 from pathlib import Path
 
-from auto_dlp import terminal_formatting
+from pycopy import logging
+from pycopy import terminal_formatting
 
 
-def sync(src: Path, dest: Path, verbose=True, do_delete=False, check_modification_date=True, check_size=True, use_colors=True):
+def sync(src: Path, dest: Path, verbose=True, do_delete=False, check_metadata=True,
+         advanced_output_features=True):
+    """
+    Sync the src and dest paths (can be files)
+    :param src: The path dictating what should be at dest
+    :param dest: The path that will be modified
+    :param verbose: Print output when deleting files
+    :param do_delete: Whether files should be deleted
+    :param check_metadata: Whether to check the modification date and the file size to determine whether the file needs to be updated
+    :param advanced_output_features: Whether to use ANSI color codes in the output and print the current position in the file system
+    :return:
+    """
+
+    if not verbose:
+        advanced_output_features = False
+
     if not src.exists():
-        utils.hide_temp()
-        print(f"Deleting {terminal_formatting.add_color(1, dest)}")
+        if not do_delete: return
+
+        if advanced_output_features:
+            terminal_formatting.hide_temp()
+        if verbose:
+            logging.log("Deleting ", logging.Color(1), dest, use_color=advanced_output_features)
         delete_path(dest)
         return
 
     if src.is_dir():
-        utils.print_temp(src)
+        if advanced_output_features:
+            utils.print_temp(src)
 
         if dest.exists() and not dest.is_dir():
-            utils.hide_temp()
-            print(f"Deleting {dest}")
+            if not do_delete:
+                return
+
+            if advanced_output_features:
+                utils.hide_temp()
+
+            if verbose:
+                logging.log("Deleting ", logging.Color(1), dest, use_color=advanced_output_features)
             delete_path(dest)
 
         dest.mkdir(parents=True, exist_ok=True)
 
-        for item in dest.iterdir():
-            sub_path = item.relative_to(dest)
-            sync(src / sub_path, dest / sub_path, check_modification_date=check_modification_date)
+        kwargs = {
+            "verbose": verbose,
+            "do_delete": do_delete,
+            "check_metadata": check_metadata,
+            "advanced_output_features": advanced_output_features
+        }
+
+        if do_delete:
+            for item in dest.iterdir():
+                sub_path = item.relative_to(dest)
+                sync(src / sub_path, dest / sub_path, **kwargs)
 
         for item in src.iterdir():
             sub_path = item.relative_to(src)
-            sync(src / sub_path, dest / sub_path, check_modification_date=check_modification_date)
+            sync(src / sub_path, dest / sub_path, **kwargs)
 
-        utils.hide_temp()
+        terminal_formatting.hide_temp()
+        return
+
+    if not check_metadata:
+        if dest.is_dir():
+            if advanced_output_features:
+                terminal_formatting.hide_temp()
+
+            if verbose:
+                logging.log("Deleting ", logging.Color(1), dest)
+            delete_path(dest)
+
+        shutil.copyfile(src, dest)
+
         return
 
     if not dest.exists():
-        # dest.touch(exist_ok=True)
         dest_mod = -1
+        dest_size = -1
     elif dest.is_dir():
-        utils.hide_temp()
-        print(f"Deleting {dest}")
+        if advanced_output_features:
+            terminal_formatting.hide_temp()
+
+        if verbose:
+            logging.log("Deleting ", logging.Color(1), dest)
         delete_path(dest)
-        # dest.touch(exist_ok=True)
         dest_mod = -1
+        dest_size = -1
     else:
         dest_mod = path.getmtime(dest)
+        dest_size = path.getsize(dest)
 
     src_mod = path.getmtime(src)
+    src_size = path.getsize(src)
 
-    if src_mod <= dest_mod:
+    if src_mod <= dest_mod and src_size == dest_size:
         return
 
     shutil.copyfile(src, dest)
