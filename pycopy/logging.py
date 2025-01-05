@@ -28,4 +28,4 @@ def log(*message, use_color=True):
             return chunk.ansi_escape_code()
         return chunk
 
-    print("[pysync]", *(process_message_chunk(chunk) for chunk in message), sep="")
+    print("[pycopy]", *(process_message_chunk(chunk) for chunk in message), sep="")

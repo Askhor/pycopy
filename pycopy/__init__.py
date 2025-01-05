@@ -1,10 +1,11 @@
 import argparse
 from pathlib import Path
 
-import pysync.logging as logging
+import pycopy.logging as logging
+import version
 from fs_sync import sync
 
-PROGRAM_NAME = "pysync"
+PROGRAM_NAME = "pycopy"
 
 
 def command_entry_point():
@@ -53,6 +54,8 @@ def main():
         logging.log(f"The destination path {d} does not exist", use_color=use_color)
 
         if args.create_toplevel:
+            logging.log(f"Creating {d}", use_color=use_color)
             d.touch()
 
     for d in destinations:
+        sync(source, d, not args.quiet, args.delete, not args.force, not args.force, not args.no_color)

@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pysync"
+name = "pycopy"
 version = "2025.1.0" # version
 authors = [
     { name = "Guenthner", email = "guenthner.jonathan@gmail.com" },
@@ -14,11 +14,10 @@ requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent
+    "Operating System :: OS Independent"
 ]
-dependencies = [
-]
+# dependencies = []
 keywords = ["Files", "Syncing"]
 
 [project.scripts]
-pysync = "pysync:command_entry_point"
+pycopy = "pycopy:command_entry_point"

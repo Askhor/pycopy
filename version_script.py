@@ -3,7 +3,7 @@ import re
 import sys
 from pathlib import Path
 
-python_version_file = Path(".") / "pysync" / "version.py"
+python_version_file = Path(".") / "pycopy" / "version.py"
 pyproject_toml_regex = re.compile("\"(?P<VERSION>[0-9]+\\.[0-9]+\\.[0-9]+)\"\\s*#\\s?version")
 
 def get_version(increment):
