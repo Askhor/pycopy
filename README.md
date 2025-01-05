@@ -17,6 +17,12 @@ pycopy.sync("path/to/directory1", "path/to/directory2", do_delete=True)
 ```
 
 ### Usage as command
+First install the library as a command, usually like so:
+```bash
+pipx install pycopy
+```
+
+Then simply execute the command using:
 ```bash
 pycopy "path/to/directory1" "path/to/directory2" 
 ```
