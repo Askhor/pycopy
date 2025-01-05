@@ -13,7 +13,7 @@ class Color:
         if self.code is None:
             return "\x1b[m"
         else:
-            return f"\x1b[38;5;{self.code}"
+            return f"\x1b[38;5;{self.code}m"
 
 
 def log(*message, use_color=True):
@@ -28,6 +28,6 @@ def log(*message, use_color=True):
             return chunk.ansi_escape_code()
         return chunk
 
-    message = ("[pycopy] ", *message, Color(None))
+    message = ("[", Color(2), "pycopy", Color(None), "] ", *message, Color(None))
 
     print(*(process_message_chunk(chunk) for chunk in message), sep="")

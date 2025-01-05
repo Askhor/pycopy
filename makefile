@@ -18,3 +18,6 @@ upload:
 
 reload:
 	make upload
+	pipx upgrade pycopy
+	pipx upgrade pycopy
+	pycopy --version . .

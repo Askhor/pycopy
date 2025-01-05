@@ -38,7 +38,7 @@ def main():
     use_color = not args.no_color
 
     if args.version:
-        logging.log(PROGRAM_NAME, "version", version.program_version, use_color=use_color)
+        logging.log(PROGRAM_NAME, " version ", version.program_version, use_color=use_color)
         return
 
     source = Path(args.source)
