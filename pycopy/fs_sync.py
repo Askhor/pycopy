@@ -71,6 +71,9 @@ def sync(src, dest, verbose=True, do_delete=False, check_metadata=True,
             terminal_formatting.hide_temp()
         return
 
+    if advanced_output_features:
+        terminal_formatting.print_temp(src)
+
     if not check_metadata:
         if dest.is_dir():
             if advanced_output_features:
