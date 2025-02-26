@@ -6,7 +6,7 @@ build:
 	$(py) -m build
 
 version:
-	$(py) version_script.py
+	vinc
 
 clean:
 	touch dist/fuck
