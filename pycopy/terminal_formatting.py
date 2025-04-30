@@ -1,14 +1,15 @@
 import os
 
+_right_padding = 20
 
 def _trim_to_terminal_width(string: str):
     string = str(string)
-    terminal_width = os.get_terminal_size().columns
+    terminal_width = os.get_terminal_size().columns - _right_padding
 
     if len(string) <= terminal_width:
         return string
 
-    return string[:terminal_width - 3] + "..."
+    return string[:terminal_width // 2 - 3] + "..." + string[len(string) - terminal_width//2:]
 
 
 def add_color(color, string):
