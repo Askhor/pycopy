@@ -32,7 +32,7 @@ class Syncer:
                 logging.log(f"Reading hashes from {self.hash_file}")
             else:
                 self.dst_hashes = HashTracker(dst)
-                self.hash_file.write_text(self.dst_hashes.serialise())
+                self.write_text(self.hash_file, self.dst_hashes.serialise())
                 logging.log(f"Creating empty hashes file at {self.hash_file}")
 
     def _check_wrong_file_type(self, dst: Path, should_be_dir: bool) -> bool:
@@ -110,7 +110,7 @@ class Syncer:
         self.last_autosave_time = time.time()
 
         terminal_formatting.print_temp(f"Saving hashes to {self.hash_file}")
-        self.hash_file.write_text(self.dst_hashes.serialise())
+        self.write_text(self.hash_file, self.dst_hashes.serialise())
 
     def visit_file(self, path: Path):
         src = self.src / path
@@ -164,6 +164,11 @@ class Syncer:
         """
         dest.unlink(missing_ok=True)
         shutil.copyfile(src, dest)
+
+    @staticmethod
+    def write_text(dst: Path, text: str):
+        dst.unlink(missing_ok=True)
+        dst.write_text(text)
 
     @staticmethod
     def delete_path(file: Path):
