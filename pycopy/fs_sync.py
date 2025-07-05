@@ -83,7 +83,7 @@ def sync(src, dest, verbose=True, do_delete=False, check_metadata=True,
                 logging.log("Deleting ", logging.Color(1), dest)
             delete_path(dest)
 
-        shutil.copyfile(src, dest)
+        copy_file(src, dest)
 
         return
 
@@ -109,6 +109,15 @@ def sync(src, dest, verbose=True, do_delete=False, check_metadata=True,
     if src_mod <= dest_mod and src_size == dest_size:
         return
 
+    copy_file(src, dest)
+
+
+def copy_file(src: Path, dest: Path):
+    """
+    This method exists to delete files if they might be copied over.
+    This MIGHT help with certain mounted file systems being buggy
+    """
+    dest.unlink(missing_ok=True)
     shutil.copyfile(src, dest)
 
 

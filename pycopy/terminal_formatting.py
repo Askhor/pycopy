@@ -4,7 +4,10 @@ _right_padding = 20
 
 def _trim_to_terminal_width(string: str):
     string = str(string)
-    terminal_width = os.get_terminal_size().columns - _right_padding
+    try:
+        terminal_width = os.get_terminal_size().columns - _right_padding
+    except OSError:
+        return string
 
     if len(string) <= terminal_width:
         return string
