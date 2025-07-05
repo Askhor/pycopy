@@ -24,14 +24,21 @@ def main():
     parser.add_argument("destinations", metavar="DEST...", nargs=argparse.REMAINDER,
                         help="The paths to which to sync to")
     parser.add_argument("-f", "--force", action="store_true",
-                        help="Disables checks for whether modification time and file size are different and always copies all files")
+                        help="Disables checks for whether modification time and file size are different (does not disable the "
+                             "hash lookup)")
     parser.add_argument("-d", "--delete", action="store_true",
                         help="Allows the program to delete files if they don't exist in the source")
     parser.add_argument("-nc", "--no-color", action="store_true",
                         help="Disables the use of color in the console output (using ANSI escape codes)")
-    parser.add_argument("-q", "--quiet", action="store_true", help="Output no information messages to the console")
+    parser.add_argument("-q", "--quiet", action="store_true", help="Output no information messages "
+                                                                   "to the console")
     parser.add_argument("-ct", "--create-toplevel", action="store_true",
-                        help="Create the destination path if it does not exist. Without this option that destination is simply skipped.")
+                        help="Create the destination path if it does not exist. Without this option that "
+                             "destination is simply skipped.")
+    parser.add_argument("--hash", action="store_true",
+                        help="After copying stores hashes of files and directories in the destinations, "
+                             "on the next copy operations only directories and files with differing hashes "
+                             "need to be checked")
     parser.add_argument("--version", action="store_true", help="Show the current version of the program")
 
     args = parser.parse_args()
@@ -58,4 +65,4 @@ def main():
             d.touch()
 
     for d in destinations:
-        sync(source, d, not args.quiet, args.delete, not args.force, not args.no_color)
+        sync(source, d, not args.quiet, args.delete, not args.force, not args.no_color, args.hash)
