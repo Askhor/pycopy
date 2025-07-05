@@ -135,6 +135,7 @@ class Syncer:
                 logging.log("IOError occurred: ",
                             Color(1), e, Color(None),
                             " at path ", Color(1), path, Color(None),
+                            f"({errors}/3)",
                             use_color=self.advanced_output_features)
                 errors += 1
 
