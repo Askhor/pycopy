@@ -67,10 +67,10 @@ class Syncer:
 
         if self.do_delete:
             for item in os.listdir(dst):
-                self.visit(path / item)
+                self.resiliently_visit(path / item)
 
         for item in os.listdir(src):
-            self.visit(path / item)
+            self.resiliently_visit(path / item)
 
         self.update_hashes(path)
 
@@ -122,6 +122,21 @@ class Syncer:
         if self.should_copy(path):
             self.copy_file(src, dst)
             self.update_hashes(path)
+
+    def resiliently_visit(self, path: Path):
+        errors = 0
+
+        while errors < 3:
+            try:
+                self.visit(path)
+                return
+            except IOError as e:
+                terminal_formatting.hide_temp()
+                logging.log("IOError occurred: ",
+                            Color(1), e, Color(None),
+                            " at path ", Color(1), path, Color(None),
+                            use_color=self.advanced_output_features)
+                errors += 1
 
     def visit(self, path: Path):
         self.autosave_hashes()
@@ -205,5 +220,5 @@ def sync(src, dest, verbose=True, do_delete=False, check_metadata=True,
     """
 
     syncer = Syncer(Path(src), Path(dest), verbose, do_delete, check_metadata, advanced_output_features, use_hash)
-    syncer.visit(Path("."))
+    syncer.resiliently_visit(Path("."))
     syncer.finish()
