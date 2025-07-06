@@ -29,12 +29,12 @@ class Syncer:
             self.hash_file = dst / ".hashes.json"
             self.src_hashes = HashTracker.from_file(src)
             if self.hash_file.exists():
-                self.dst_hashes = HashTracker.from_serialized(dst, self.hash_file.read_text())
                 logging.log(f"Reading hashes from {self.hash_file}")
+                self.dst_hashes = HashTracker.from_serialized(dst, self.hash_file.read_text())
             else:
                 self.dst_hashes = HashTracker(dst)
-                self.write_text(self.hash_file, self.dst_hashes.serialise())
                 logging.log(f"Creating empty hashes file at {self.hash_file}")
+                self.write_text(self.hash_file, self.dst_hashes.serialise())
 
     def _check_wrong_file_type(self, dst: Path, should_be_dir: bool) -> bool:
         if dst.exists() and (dst.is_dir() != should_be_dir):
