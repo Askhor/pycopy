@@ -3,7 +3,7 @@ import json
 from json import JSONDecodeError
 from pathlib import Path
 
-from pycopy.logging import log
+from pycopy.logging import log, Color
 
 
 def hash_file(path: Path) -> str:
