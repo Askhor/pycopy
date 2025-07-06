@@ -197,7 +197,7 @@ class Syncer:
 
         if file.is_dir():
             for item in file.iterdir():
-                delete_path(item)
+                self.delete_path(item)
             file.rmdir()
             return
 
