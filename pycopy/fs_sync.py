@@ -187,8 +187,7 @@ class Syncer:
         dst.unlink(missing_ok=True)
         dst.write_text(text)
 
-    @staticmethod
-    def delete_path(file: Path):
+    def delete_path(self, file: Path):
         """
         Deletes this file if path is a folder or the folder and all subdirectories
         """
