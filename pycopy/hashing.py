@@ -1,5 +1,6 @@
 import hashlib
 import json
+from json import JSONDecodeError
 from pathlib import Path
 
 from pycopy.logging import log
@@ -58,8 +59,13 @@ class HashTracker:
 
     @classmethod
     def from_serialized(cls, relative_to: Path, string: str):
-        hashes = json.loads(string)
         tracker = HashTracker(relative_to)
+
+        try:
+            hashes = json.loads(string)
+        except JSONDecodeError:
+            log(Color(1), "Could not open hashes file. Ignoring it", Color(None), use_color=True)
+            return tracker
 
         for path, hash_value in hashes.items():
             tracker.hashes[Path(path)] = hash_value
