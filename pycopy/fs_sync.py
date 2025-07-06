@@ -6,6 +6,7 @@ from pathlib import Path
 from pycopy import logging
 from pycopy import terminal_formatting
 from pycopy.hashing import HashTracker
+from pycopy.logging import Color
 
 
 class Syncer:
