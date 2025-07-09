@@ -184,6 +184,7 @@ class Syncer:
 
     @staticmethod
     def write_text(dst: Path, text: str):
+        dst.parent.mkdir(parents=True, exist_ok=True)
         dst.unlink(missing_ok=True)
         dst.write_text(text)
 
