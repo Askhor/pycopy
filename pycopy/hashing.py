@@ -14,8 +14,9 @@ def hash_file(path: Path) -> str:
 
 
 class HashTracker:
-    def __init__(self, relative_to: Path):
+    def __init__(self, relative_to: Path, verbosity: int = 1):
         self.relative_to = relative_to
+        self.verbosity = verbosity
         self.hashes = {}
 
     def get_hash(self, path: Path) -> str:
@@ -51,20 +52,22 @@ class HashTracker:
             self._set_hash(relative_path, hash_file(path))
 
     @classmethod
-    def from_file(cls, path: Path):
-        log(f"Calculating hashes for {path}")
-        tracker = HashTracker(path)
+    def from_file(cls, path: Path, verbosity: int = 1):
+        if verbosity >= 1:
+            log(f"Calculating hashes for {path}")
+        tracker = HashTracker(path, verbosity)
         tracker._scan_file(path)
         return tracker
 
     @classmethod
-    def from_serialized(cls, relative_to: Path, string: str):
-        tracker = HashTracker(relative_to)
+    def from_serialized(cls, relative_to: Path, string: str, verbosity: int = 1):
+        tracker = HashTracker(relative_to, verbosity)
 
         try:
             hashes = json.loads(string)
         except JSONDecodeError:
-            log(Color(1), "Could not open hashes file. Ignoring it", Color(None), use_color=True)
+            if verbosity >= 1:
+                log(Color(1), "Could not open hashes file. Ignoring it", Color(None), use_color=True)
             return tracker
 
         for path, hash_value in hashes.items():

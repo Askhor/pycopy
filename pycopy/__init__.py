@@ -39,6 +39,7 @@ def main():
                         help="After copying stores hashes of files and directories in the destinations, "
                              "on the next copy operations only directories and files with differing hashes "
                              "need to be checked")
+    parser.add_argument('-v', '--verbose', action='store_true', help="Show more output")
     parser.add_argument("--version", action="store_true", help="Show the current version of the program")
 
     args = parser.parse_args()
@@ -56,13 +57,20 @@ def main():
 
     destinations = [Path(d) for d in args.destinations]
 
+    verbosity = 1
+    if args.verbose:
+        verbosity = 2
+    if args.quiet:
+        verbosity = 0
+
     for d in destinations:
         if d.exists(): continue
         logging.log(f"The destination path {d} does not exist", use_color=use_color)
 
         if args.create_toplevel:
-            logging.log(f"Creating {d}", use_color=use_color)
+            if verbosity >= 1:
+                logging.log(f"Creating {d}", use_color=use_color)
             d.touch()
 
     for d in destinations:
-        sync(source, d, not args.quiet, args.delete, not args.force, not args.no_color, args.hash)
+        sync(source, d, verbosity, args.delete, not args.force, not args.no_color, args.hash)

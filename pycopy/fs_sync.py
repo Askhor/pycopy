@@ -10,9 +10,9 @@ from pycopy.logging import Color
 
 
 class Syncer:
-    def __init__(self, src: Path, dst: Path, verbose, do_delete, check_metadata,
-                 advanced_output_features, use_hash: bool):
-        if not verbose:
+    def __init__(self, src: Path, dst: Path, verbosity: int, do_delete: bool, check_metadata: bool,
+                 advanced_output_features: bool, use_hash: bool):
+        if verbosity <= 0:
             advanced_output_features = False
 
         self.src = src
@@ -21,7 +21,7 @@ class Syncer:
         self.advanced_output_features = advanced_output_features
         self.check_metadata = check_metadata
         self.do_delete = do_delete
-        self.verbose = verbose
+        self.verbosity = verbosity
         self.force = (not check_metadata) and (not use_hash)
         self.last_autosave_time = time.time()
 
@@ -29,11 +29,13 @@ class Syncer:
             self.hash_file = dst / ".hashes.json"
             self.src_hashes = HashTracker.from_file(src)
             if self.hash_file.exists():
-                logging.log(f"Reading hashes from {self.hash_file}")
+                if self.verbosity >= 1:
+                    logging.log(f"Reading hashes from {self.hash_file}")
                 self.dst_hashes = HashTracker.from_serialized(dst, self.hash_file.read_text())
             else:
                 self.dst_hashes = HashTracker(dst)
-                logging.log(f"Creating empty hashes file at {self.hash_file}")
+                if self.verbosity >= 1:
+                    logging.log(f"Creating empty hashes file at {self.hash_file}")
                 self.write_text(self.hash_file, self.dst_hashes.serialise())
 
     def _check_wrong_file_type(self, dst: Path, should_be_dir: bool) -> bool:
@@ -47,7 +49,7 @@ class Syncer:
             if self.advanced_output_features:
                 terminal_formatting.hide_temp()
 
-            if self.verbose:
+            if self.verbosity >= 1:
                 logging.log("Deleting ", logging.Color(1), dst, use_color=self.advanced_output_features)
             self.delete_path(dst)
 
@@ -154,7 +156,7 @@ class Syncer:
 
             if self.advanced_output_features:
                 terminal_formatting.hide_temp()
-            if self.verbose:
+            if self.verbosity >= 1:
                 logging.log("Deleting ", logging.Color(1), dst, use_color=self.advanced_output_features)
             self.delete_path(dst)
             return
@@ -173,13 +175,15 @@ class Syncer:
     def is_protected(self, path: Path):
         return not self.use_hashes or path == self.hash_file
 
-    @staticmethod
-    def copy_file(src: Path, dest: Path):
+    def copy_file(self, src: Path, dest: Path):
         """
         This method exists to delete files if they might be copied over.
         This MIGHT help with certain mounted file systems being buggy
         """
         dest.unlink(missing_ok=True)
+        if self.verbosity >= 2:
+            terminal_formatting.hide_temp()
+            logging.log(f"Copying file from {src} to {dest}")
         shutil.copyfile(src, dest)
 
     @staticmethod
@@ -208,19 +212,19 @@ class Syncer:
         terminal_formatting.hide_temp()
 
 
-def sync(src, dest, verbose=True, do_delete=False, check_metadata=True,
+def sync(src, dest, verbosity=1, do_delete=False, check_metadata=True,
          advanced_output_features=True, use_hash: bool = False):
     """
     Sync the src and dest paths (can be files)
     :param src: The path dictating what should be at dest
     :param dest: The path that will be modified
-    :param verbose: Print output when deleting files
+    :param verbosity: Print output when deleting files
     :param do_delete: Whether files should be deleted
     :param check_metadata: Whether to check the modification date and the file size to determine whether the file needs to be updated
     :param advanced_output_features: Whether to use ANSI color codes in the output and print the current position in the file system
     :param use_hash: Whether to store the hashes of the copied files in a small file in the destination
     """
 
-    syncer = Syncer(Path(src), Path(dest), verbose, do_delete, check_metadata, advanced_output_features, use_hash)
+    syncer = Syncer(Path(src), Path(dest), verbosity, do_delete, check_metadata, advanced_output_features, use_hash)
     syncer.resiliently_visit(Path("."))
     syncer.finish()
